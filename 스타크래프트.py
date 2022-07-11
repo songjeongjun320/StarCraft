@@ -47,25 +47,11 @@ class FlyableAttackUnit(Flyable, AttackUnit):
         print("[공중 유닛 이동]")
         self.fly(self.name, location)
 
-# 레이스
-class Wraith(FlyableAttackUnit):
-    def __init__(self):
-        FlyableAttackUnit.__init__(self, "레이스", 100, 15, 10)
-        self.clocked = False # 클로킹 모드 (해제 상태)
-    
-    def clocking(self):
-        if self.clocked == True:
-            print("{0} : 클로킹 모드를 해제합니다.".format(self.name))
-            self.clocked == False
-        else:
-            print("{0} : 클로킹 모드를 설정합니다.".format(self.name))
-            self.clocked == True
-
-
 # 마린
 class Marine(AttackUnit):
-    def __init__(self):
-        AttackUnit.__init__(self, "마린", 40, 1, 5)
+    def __init__(self, num):
+        self.num = num
+        AttackUnit.__init__(self, "마린" + str(num), 40, 1, 5)
 
     # 스팀팩 : 일정 시간 동안 이동 및 공격 속도를 증가, 자기 체력 10 감소
     def stimpack(self):
@@ -80,9 +66,10 @@ class Tank(AttackUnit):
     # 시즈모드 : 탱크를 지상에 고정시켜, 더 높은 파워로 공격 가능. 이동 불가.
     seize_developed = False # 시즈모드 개발여부
 
-    def __init__(self):
-        AttackUnit.__init__(self, "탱크", 150, 1, 35)
+    def __init__(self, num):
+        AttackUnit.__init__(self, "탱크" + str(num), 150, 1, 35)
         self.seize_mode = False
+        self.num =num
 
     def set_seize_mode(self):
         if Tank.seize_developed == False:
@@ -95,10 +82,25 @@ class Tank(AttackUnit):
             self.seize_mode = True
         
         # 현재 시즈모드 일때 -> 시즈모드 해제
-        if self.seize_mode == True:
+        elif self.seize_mode == True:
             print("{0} : 시즈모드를 해제 합니다.".format(self.name))
             self.damage /= 2
             self.seize_mode = False
+
+# 레이스
+class Wraith(FlyableAttackUnit):
+    def __init__(self, num):
+        FlyableAttackUnit.__init__(self, "레이스" + str(num), 100, 15, 10)
+        self.clocked = False # 클로킹 모드 (해제 상태)
+        self.num = num
+
+    def clocking(self):
+        if self.clocked == True:
+            print("{0} : 클로킹 모드를 해제합니다.".format(self.name))
+            self.clocked == False
+        else:
+            print("{0} : 클로킹 모드를 설정합니다.".format(self.name))
+            self.clocked == True
 
 def game_start():
     print("[알림] 새로운 게임을 시작합니다.")
@@ -111,16 +113,16 @@ def game_over():
 game_start()
 
 # 마린 3기 생성
-m1 = Marine()
-m2 = Marine()
-m3 = Marine()
+m1 = Marine(1)
+m2 = Marine(2)
+m3 = Marine(3)
 
 # 탱크 2기 생성
-t1 = Tank()
-t2 = Tank()
+t1 = Tank(1)
+t2 = Tank(2)
 
 # 레이스 1기 생성
-w1 = Wraith()
+w1 = Wraith(1)
 
 # 유닛 일괄 관리
 attack_units = []
@@ -140,7 +142,7 @@ Tank.seize_developed = True
 print("[알림] 탱크 시즈 모드 개발이 완료되었습니다.")
 
 # 공격 모드 준비 (탱크 : 시즈모드, 레이스 : 클로킹, 마린 : 스팀팩)
-for units in attack_units:
+for unit in attack_units:
     if isinstance(unit, Marine):
         unit.stimpack()
     elif isinstance(unit, Tank):
